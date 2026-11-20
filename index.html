@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScriptHost Mini</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background:#0b0e14; color:#e6e9f0; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .card { max-width:640px; width:100%; background:#12161f; border:1px solid #232a3a; border-radius:18px; padding:34px; }
+  h1 { font-size:26px; letter-spacing:-.02em; }
+  h1 span { background:linear-gradient(90deg,#6c5cff,#00c2a8); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  p { color:#8b93a7; line-height:1.65; font-size:14.5px; margin-top:12px; }
+  code, .box { font-family: ui-monospace, Consolas, monospace; }
+  .box { background:#0a0d13; border:1px solid #232a3a; border-radius:12px; padding:14px 16px; font-size:13px; color:#a9e8dd; word-break:break-all; margin-top:14px; cursor:pointer; }
+  .box:hover { border-color:#00c2a8; }
+  .box small { display:block; color:#8b93a7; font-family:system-ui,sans-serif; font-size:11.5px; margin-bottom:6px; }
+  .row { display:flex; gap:9px; margin-top:18px; flex-wrap:wrap; }
+  button, a.btn { border:none; cursor:pointer; border-radius:10px; padding:11px 18px; font-size:14px; font-weight:600; text-decoration:none; }
+  .primary { background:linear-gradient(90deg,#6c5cff,#8a5cff); color:#fff; }
+  .ghost { background:#171c28; color:#e6e9f0; border:1px solid #232a3a; }
+  button:hover, a.btn:hover { filter:brightness(1.2); }
+  ol { color:#8b93a7; font-size:14.5px; line-height:1.9; margin:14px 0 0 20px; }
+  ol code { background:#0a0d13; border:1px solid #232a3a; border-radius:6px; padding:1px 7px; font-size:12.5px; color:#a9e8dd; }
+  #toast { position:fixed; bottom:22px; left:50%; transform:translate(-50%,80px); background:#1d2436; border:1px solid #6c5cff; padding:12px 22px; border-radius:999px; font-size:14px; transition:.3s; }
+  #toast.show { transform:translate(-50%,0); }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>📜 Script<span>Host</span> Mini</h1>
+  <p>Весь сайт — этот один файл. Второй файл, <code>Script.lua</code>, — твой скрипт, который лоадится по прямой ссылке, как на GitHub Raw.</p>
+
+  <div class="box" id="urlBox" title="Клик — скопировать"><small>ПРЯМАЯ ССЫЛКА НА СКРИПТ (клик — скопировать)</small><span id="url"></span></div>
+  <div class="box" id="lsBox" title="Клик — скопировать"><small>LOADER ДЛЯ EXECUTOR (клик — скопировать)</small><span id="ls"></span></div>
+
+  <div class="row">
+    <a class="btn primary" id="openRaw" target="_blank">↗ Открыть Script.lua</a>
+    <button class="ghost" id="copyLs">🎮 Копировать loader</button>
+  </div>
+
+  <p style="margin-top:22px"><b style="color:#e6e9f0">Как поменять скрипт:</b></p>
+  <ol>
+    <li>Открой файл <code>Script.lua</code> (на GitHub — карандашик ✏️, или у себя в редакторе)</li>
+    <li>Удали всё и вставь свой код, сохрани / закоммить</li>
+    <li>Vercel сам передеплоит сайт за ~20 секунд — ссылка та же, код уже новый</li>
+  </ol>
+  <p>Надо ещё скриптов? Просто добавь рядом файл, например <code>Other.lua</code> — он сразу будет доступен по адресу <code>/Other.lua</code>. Ничего настраивать не надо.</p>
+</div>
+<div id="toast">Скопировано!</div>
+
+<script>
+// ⬇️ ЕСЛИ ПЕРЕИМЕНУЕШЬ Script.lua — поменяй имя и тут
+const FILE = 'Script.lua';
+
+const url = location.origin + '/' + FILE;
+const loadstring = `loadstring(game:HttpGet("${url}"))()`;
+document.getElementById('url').textContent = url;
+document.getElementById('ls').textContent = loadstring;
+document.getElementById('openRaw').href = '/' + FILE;
+
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); }
+  catch { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+  const el = document.getElementById('toast'); el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2200);
+}
+document.getElementById('urlBox').onclick = () => copy(url);
+document.getElementById('lsBox').onclick = () => copy(loadstring);
+document.getElementById('copyLs').onclick = () => copy(loadstring);
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5da39f57ba2cf5c',t:'MTc5NTIwNjc3Mg=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5da39f57ba2cf5c',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
